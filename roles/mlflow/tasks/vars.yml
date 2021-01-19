@@ -1,0 +1,13 @@
+docker_host: 172.17.0.1
+
+postgres_external_port: 5433
+postgres_user: mlflow_user
+postgres_password: mlflow_password
+mlflow_db_name: mlflow
+
+s3_port: 9000
+minio_access_key: minioadmin
+minio_secret_key: minioadmin
+mlflow_bucket: mlflow/data
+
+mlflow_port: 5000

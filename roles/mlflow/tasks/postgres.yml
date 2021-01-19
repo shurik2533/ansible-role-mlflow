@@ -1,0 +1,30 @@
+- name: check/create postgresql container
+  docker_container:
+    name: postgres
+    image: >-
+      postgres:11.4-alpine
+    state: started
+    restart_policy: always
+    volumes:
+      - /var/lib/postgresql/data:/postgres_data
+    ports: "{{ postgres_external_port }}:5432"
+
+- name : wait for postgresql starts
+  wait_for:
+    host: "{{ docker_host }}"
+    port: "{{ postgres_external_port }}"
+
+- name: Create a new database
+  postgresql_db:
+    name: "{{ mlflow_db_name }}"
+    login_host: "{{ docker_host }}"
+    port: "{{ postgres_external_port }}"
+
+- name: Create mlflow user, and grant access to database
+  postgresql_user:
+    login_host: "{{ docker_host }}"
+    port: "{{ postgres_external_port }}"
+    db: "{{ mlflow_db_name }}"
+    name: "{{ postgres_user }}"
+    password: "{{ postgres_password }}"
+    priv: "ALL"

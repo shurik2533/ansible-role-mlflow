@@ -1,0 +1,6 @@
+- include_vars: vars.yml
+
+- include_tasks: docker.yml
+- include_tasks: postgres.yml
+- include_tasks: minio.yml
+- include_tasks: mlflow.yml

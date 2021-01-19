@@ -1,0 +1,24 @@
+- name: run minio node
+  docker_container:
+    image: minio/minio:edge
+    name: minio
+    state: started
+    restart_policy: always
+    env:
+      MINIO_ACCESS_KEY: "{{ minio_access_key }}"
+      MINIO_SECRET_KEY: "{{ minio_secret_key }}"
+    volumes:
+      - /var/minio_data:/minio_data
+    ports: "{{ s3_port }}:{{ s3_port }}"
+    command: server /minio_data
+
+- name: create bucket for mlflow
+  docker_container:
+    image: minio/mc
+    name: minio_mc
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add myminio http://{{ docker_host }}:{{ s3_port }} {{ minio_access_key }} {{ minio_secret_key }};
+      /usr/bin/mc mb myminio/{{ mlflow_bucket }};
+      exit 0;
+      "

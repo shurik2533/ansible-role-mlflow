@@ -1,0 +1,27 @@
+- name: build mlflow image
+  docker_image:
+    name: mlflow
+    build:
+      path: "{{ playbook_dir }}/docker/mlflow"
+      pull: no
+    state: present
+    source: build
+
+- name: run mlflow server
+  docker_container:
+    env:
+      DOCKER_HOST: "{{ docker_host }}"
+      POSTGRES_PORT: "{{ postgres_external_port|quote }}"
+      POSTGRES_USER: "{{ postgres_user }}"
+      POSTGRES_PASSWORD: "{{ postgres_password }}"
+      DB_NAME: "{{ mlflow_db_name }}"
+      MLFLOW_PORT: "{{ mlflow_port|quote }}"
+      MLFLOW_S3_ENDPOINT_URL: "http://{{ docker_host }}:{{ s3_port }}"
+      AWS_ACCESS_KEY_ID: "{{ minio_access_key }}"
+      AWS_SECRET_ACCESS_KEY: "{{ minio_secret_key }}"
+      MLFLOW_S3_BUCKET: "{{ mlflow_bucket }}"
+    name: mlflow_server
+    image: mlflow
+    state: started
+    restart_policy: always
+    ports: "{{ mlflow_port }}:{{ mlflow_port }}"
